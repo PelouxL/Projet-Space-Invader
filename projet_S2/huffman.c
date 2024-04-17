@@ -82,33 +82,44 @@ void minimum(int tab_occ[256], int min[2]){
 }
 
 void creer_noeud(noeud *huffman[256], int tab_occ[256], int taille){
-    int min[2];
+    int min[2], i = 0;
     noeud *n;
 
     if (taille == 1){
+        while(huffman[i] == NULL)
+            i++;
+        huffman[0] = huffman[i];
+        huffman[i] = NULL;
         return;
     }
-    
+
+    /* Recherche des noeuds avec le moins d'occurence */
     minimum(tab_occ, min);
 
+    /* Ajout du nb d'occurence de min[1] dans min[0] */
     tab_occ[min[0]] += tab_occ[min[1]];
     tab_occ[min[1]] = 0;
-        
+
+    /* Creation du nouveau noeud */
     if ((n = (noeud *) malloc(sizeof(noeud))) == NULL){
         printf("ERREUR creer_noeud: echec malloc\n");
         exit(EXIT_FAILURE);
     }
-
+    
+    /* total des occurence des min */
     n->occ = tab_occ[min[0]];
     n->nb_bits = 0;
+    /* Les min deviennent les fils du nouveau noeud */
     if (min[0] != -1) n->f_g = huffman[min[0]];
     if (min[1] != -1) n->f_d = huffman[min[1]];
 
+    /* Le nouveau noeud prend la place de min[0] dans huffman et min[1] est mis à null */
     huffman[min[0]] = n;
     huffman[min[1]] = NULL;
 
     printf("%c %c\n", huffman[min[0]]->f_d->car, huffman[min[0]]->f_g->car);
 
+    /* Rappel de la fonction pour creer l'arbre recursivement */
     creer_noeud(huffman, tab_occ, taille-1);
 }
 
