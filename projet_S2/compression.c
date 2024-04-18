@@ -1,38 +1,38 @@
 #include"huffman.h"
 #include"code.h"
 
-void entete(noeud *alphabet[256], FILE *fic, FILE *res){
-    int i, nb_feuille = 0;
+/* void entete(noeud *alphabet[256], FILE *fic, FILE *res){ */
+/*     int i, nb_feuille = 0; */
 
-    /* Comptage du nombre de feuille */
-    for (i=0; i < 256; i++){
-        if (alphabet[i] != NULL){
-            nb_feuille++;           
-        }
-    }
+/*     /\* Comptage du nombre de feuille *\/ */
+/*     for (i=0; i < 256; i++){ */
+/*         if (alphabet[i] != NULL){ */
+/*             nb_feuille++;            */
+/*         } */
+/*     } */
     
-    /* ecrire le nombre de feuilles */
+/*     /\* ecrire le nombre de feuilles *\/ */
     
-    /* Code */
-    for (i=0; i < 256; i++){
-        if (alphabet[i] != NULL){
-            fwrite(alphabet[i]->car, 1, 1, res);
+/*     /\* Code *\/ */
+/*     for (i=0; i < 256; i++){ */
+/*         if (alphabet[i] != NULL){ */
+/*             fwrite(alphabet[i]->car, 1, 1, res); */
             
-        }
-    }
-}
+/*         } */
+/*     } */
+/* } */
 
 int extraire_bit(int code, int index){
     int bit;
     
-    bit = (code >> index)%2
+    bit = (code >> index)%2;
     return bit;
 }
 
 void contenu(noeud *alphabet[256], FILE *fic, FILE *res){
-    int c, acc;
+    int c, acc, bit, i;
     noeud *feuille;
-    char paquet;
+    char paquet = 0;
     
     /* Initialisation */
     acc = 8; /* Nombre de bits dans un char */
@@ -40,17 +40,21 @@ void contenu(noeud *alphabet[256], FILE *fic, FILE *res){
     /* Parcours du fichier */
     while((c = fgetc(fic)) != EOF){
         feuille = alphabet[c];
+
+        printf("%c : %d bits\n", c, feuille->nb_bits);
         
         /* on place le code dans le paquet de bits */
         for (i = feuille->nb_bits; i > 0; i--){
             bit = extraire_bit(feuille->code, i-1);
-            
+
+            printf("%d bit renvoyé : %d\n", i, bit);
+
             paquet = paquet | bit;
             paquet = paquet << 1;
             
             if (--acc == 0){
                 /* fwrite(paquet, 1, 1, res); */
-                fprintf(res, "%c", paquet);
+                fprintf(stdin, "%c", paquet);
                 paquet = paquet << 8;
                 acc = 8;
             }
@@ -59,7 +63,7 @@ void contenu(noeud *alphabet[256], FILE *fic, FILE *res){
 
     if (acc != 0 && acc != 8){
         paquet = paquet << acc;
-        fprintf(res, "%c", paquet);
+        fprintf(stdin, "%c", paquet);
     }
         
 }
@@ -77,6 +81,22 @@ void test(){
 
     printf("TEST : %c\n", c); /* 0010 1101 */
         
+}
+
+void compression(noeud *alphabet[256], FILE *fic){
+    FILE *res = NULL;
+
+    res = fopen("cmp.txt", "a");
+    if ((fic = fopen("exemples.txt", "r")) == NULL){
+        printf("JE SUIS VIDE ENCULE\n");
+        return;
+    }
+
+    contenu(alphabet, fic, res);
+    printf("\n");
+
+    fclose(res);
+    fclose(fic);
 }
 
 /* a = 00001001; */

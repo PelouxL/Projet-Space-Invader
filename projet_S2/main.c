@@ -62,7 +62,11 @@ int main(){
         }
     }
 
+    fclose(fic);
+    fic = NULL;
+    
     test();
+    compression(alphabet, fic);
     
     exit(EXIT_SUCCESS);
 }

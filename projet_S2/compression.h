@@ -3,7 +3,7 @@
 
 #include"huffman.h"
 
-void contenu(noeud *alphabet[256], FILE *fic, FILE *res);
+void compression(noeud *alphabet[256], FILE *fic);
 
 void test();
 
