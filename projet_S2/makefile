@@ -5,10 +5,16 @@ EXEC_FILES = main
 
 all : $(EXEC_FILES)
 
-main: main.c huffman.o
+main: main.c huffman.o compression.o code.o
 	$(CC) $(CFLAGS) -o $@ $^ -lm
 
 huffman.o: huffman.c huffman.h
+	$(CC) -c $(CFLAGS) $^
+
+compression.o: compression.c compression.h
+	$(CC) -c $(CFLAGS) $^
+
+code.o: code.c code.h
 	$(CC) -c $(CFLAGS) $^
 
 mgit:

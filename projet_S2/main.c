@@ -1,36 +1,6 @@
 #include"huffman.h"
-#include<math.h>
-
-/* https://public.iutenligne.net/informatique/algorithme-et-programmation/priou/LangageC/47_oprateurs_de_manipulation_de_bits__masques_et_bit__bit_dcalage.html */
-
-
-void affichage_code(int nb_bits, int code){
-
-    if (nb_bits <= 0){
-        return;
-    }
-    
-    affichage_code(nb_bits-1, code >> 1);
-    printf("%d", code%2);
-}
-
-
-void creer_code(noeud *element, int code, int profondeur){
-    noeud *courant = element;
-
-    if (est_feuille(courant) == 1){
-        courant->code = code;
-        courant->nb_bits = profondeur;
-        printf("%c : ", courant->car);
-        affichage_code(courant->nb_bits,  courant->code);
-        printf("\n");
-    } else {
-        code = code << 1;
-        creer_code(courant->f_g, (code | 0), profondeur+1);
-        creer_code(courant->f_d, (code | 1), profondeur+1);
-    }
-}
-
+#include"code.h"
+#include"compression.h"
 
 
 int main(){
@@ -91,6 +61,9 @@ int main(){
             free(huffman[i]);
         }
     }
+
+    test();
+    
     exit(EXIT_SUCCESS);
 }
   
