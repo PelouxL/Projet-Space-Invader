@@ -1,26 +1,4 @@
-#include"huffman.h"
-#include"code.h"
-
-/* void entete(noeud *alphabet[256], FILE *fic, FILE *res){ */
-/*     int i, nb_feuille = 0; */
-
-/*     /\* Comptage du nombre de feuille *\/ */
-/*     for (i=0; i < 256; i++){ */
-/*         if (alphabet[i] != NULL){ */
-/*             nb_feuille++;            */
-/*         } */
-/*     } */
-    
-/*     /\* ecrire le nombre de feuilles *\/ */
-    
-/*     /\* Code *\/ */
-/*     for (i=0; i < 256; i++){ */
-/*         if (alphabet[i] != NULL){ */
-/*             fwrite(alphabet[i]->car, 1, 1, res); */
-            
-/*         } */
-/*     } */
-/* } */
+#include"compression.h"
 
 int extraire_bit(int code, int index){
     int bit;
@@ -29,13 +7,65 @@ int extraire_bit(int code, int index){
     return bit;
 }
 
-void contenu(noeud *alphabet[256], FILE *fic, FILE *res){
+void entete(noeud *alphabet[N], FILE *res){
+    int i, j, acc, bit, nb_feuille = 0;
+    noeud *feuille = NULL;
+    char paquet = 0;
+
+    /* Initialisation */
+    acc = 8; /* Nombre de places dans le paquet (8 bits = 1 octet) */
+
+    /* Comptage du nombre de feuille */
+    for (i=0; i < N; i++){
+        if (alphabet[i] != NULL){
+            nb_feuille++;
+        }
+    }
+    fprintf(res, "%c", nb_feuille);
+    
+    /* Caractere et code associe */
+    for (i=0; i < N; i++){
+        if ((feuille = alphabet[i]) != NULL){
+
+            /* Caractere */
+            fprintf(stdout, "%c", feuille->car);
+
+            /* Nombre de bits */
+            fprintf(stdout, "%d", feuille->nb_bits);
+
+            /* Code */
+            for (j = feuille->nb_bits; j > 0; j--){
+                bit = extraire_bit(feuille->code, j-1);
+
+                /* Creation d'une place + insertion du bit dans le paquet */
+                paquet = paquet << 1;
+                paquet = paquet | bit;
+                
+                /* Verification de s'il reste de la place dans le paquet */
+                if (--acc == 0){
+                    fprintf(stdout, "%c\n", paquet); /* On ecrit le caractere dans res */
+                    acc = 8;
+                }
+                
+            }
+        }
+        
+        /* S'il reste encore de la place dans le paquet */
+        if (acc != 0 && acc != 8){
+            paquet = paquet << acc; /* On rempli les places restantes */
+            fprintf(res, "%c", paquet); /* On ecrit le caractere correspondant dans res */
+        }
+        
+    }
+}
+
+void contenu(noeud *alphabet[N], FILE *fic, FILE *res){
     int c, acc, bit, i;
-    noeud *feuille;
+    noeud *feuille = NULL;
     char paquet = 0;
     
     /* Initialisation */
-    acc = 8; /* Nombre de bits dans un char */
+    acc = 8; /* Nombre de places dans le paquet (8 bits = 1 octet) */
     
     /* Parcours du fichier */
     while((c = fgetc(fic)) != EOF){
@@ -49,27 +79,47 @@ void contenu(noeud *alphabet[256], FILE *fic, FILE *res){
 
             printf("%d bit renvoyé : %d\n", i, bit);
 
-            paquet = paquet | bit;
+            /* Creation d'une place + insertion du bit dans le paquet */
             paquet = paquet << 1;
-            
+            paquet = paquet | bit;
+
+            /* Verification de s'il reste de la place dans le paquet */
             if (--acc == 0){
-                /* fwrite(paquet, 1, 1, res); */
-                fprintf(stdin, "%c", paquet);
-                paquet = paquet << 8;
+                fprintf(res, "%c", paquet); /* On ecrit le caractere dans res */
                 acc = 8;
             }
         }
     }
 
+    /* Traitement de EOF de la maniere que les autres caracteres */
+    feuille = alphabet[256]; /* 256 = code de EOF */
+    for (i = feuille->nb_bits; i > 0; i--){
+        
+        bit = extraire_bit(feuille->code, i-1);
+        
+        printf("%d bit renvoyé : %d\n", i, bit);
+
+        /* Creation d'une place + insertion du bit dans le paquet */
+        paquet = paquet << 1;
+        paquet = paquet | bit;
+
+        if (--acc == 0){
+            fprintf(res, "%c", paquet);
+            acc = 8;
+        }
+    }
+    
+    /* S'il reste encore de la place dans le paquet */
     if (acc != 0 && acc != 8){
-        paquet = paquet << acc;
-        fprintf(stdin, "%c", paquet);
+        paquet = paquet << acc; /* On rempli les places restantes */
+        fprintf(res, "%c", paquet); /* On ecrit le caractere correspondant dans res */
+        fprintf(stdout, "paquet plein : %c\n", paquet);
     }
         
 }
 
 void test(){
-    char c;
+    char c = 0;
     
     c = c | 1;
     c = c << 2;
@@ -83,56 +133,18 @@ void test(){
         
 }
 
-void compression(noeud *alphabet[256], FILE *fic){
+void compression(noeud *alphabet[N], FILE *fic){
     FILE *res = NULL;
 
-    res = fopen("cmp.txt", "a");
+    res = fopen("cmp2.txt", "w+");
     if ((fic = fopen("exemples.txt", "r")) == NULL){
-        printf("JE SUIS VIDE ENCULE\n");
+        printf("JE SUIS VIDE COMME TES COUILLES ENCULE\n");
         return;
     }
 
+    entete(alphabet, res);
     contenu(alphabet, fic, res);
-    printf("\n");
 
     fclose(res);
     fclose(fic);
 }
-
-/* a = 00001001; */
-/* b = 00001010; */
-
-/* ab = 0000100100001010 */
-    
-
-/* c */
-/* copie = c >> i */
-/*     7 0 */
-
-/*     001 */
-
-
-/* 0000 0001 */
-
-/*     0000 0101 */
-    
-/* abc */
-/* a 01 */
-/* b 11 */
-/* c 00 */
-/*     d 010 */
-
-/* 011100 */
-
-/* 0000 1111 << 4 */
-/* 1111 0000 */
-
-/* 001 1001 1010 */
-
-/*     Une banane */
-
-
-/*     3a01 */
-/*     0100 0000 */
-    
-/*     b11c00;efkhhgkegneljn. */

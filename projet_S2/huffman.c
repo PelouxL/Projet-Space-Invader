@@ -22,19 +22,23 @@ void aff_cont(FILE* fic){
   }
 }
 
-void occurence(FILE *fic, int tab[256]){
+void occurence(FILE *fic, int tab[N]){
   int c;
 
   while((c = fgetc(fic)) != EOF){
     tab[c] += 1;
   }
+  
+  /* On attribue a EOF le code 256 */
+  tab[256] += 1;
+  
 }
 
 /**********************************************/
 /*     4.2 Creation de l'arbre de Huffman     */
 /**********************************************/
 
-noeud *creer_feuille(int tab_occ[256], int index){
+noeud *creer_feuille(int tab_occ[N], int index){
     noeud *f = NULL;
 
     if ((f = (noeud *) malloc(sizeof(noeud))) == NULL){
@@ -51,14 +55,14 @@ noeud *creer_feuille(int tab_occ[256], int index){
     return f;
 }
 
-void minimum(int tab_occ[256], int min[2]){
+void minimum(int tab_occ[N], int min[2]){
     int i;
 
     for (i=0; i < 2; i++){
         min[i] = -1;
     }
 
-    for (i=0; i < 256; i++){
+    for (i=0; i < N; i++){
         if (tab_occ[i] != 0){
             /* initialisation des min */
             if (min[0] == -1){
@@ -81,7 +85,7 @@ void minimum(int tab_occ[256], int min[2]){
     }
 }
 
-void creer_noeud(noeud *huffman[256], int tab_occ[256], int taille){
+void creer_noeud(noeud *huffman[N], int tab_occ[N], int taille){
     int min[2], i = 0;
     noeud *n;
 
@@ -133,60 +137,4 @@ int est_feuille(noeud *n){
     }
     return 0;
 }
-      
-/* int main(){ */
-/*     noeud *huffman[256]; */
-/*     FILE *fic = NULL; */
-/*     int g, i, *tab_occ, taille = 0; */
-
-/*     /\* Initialisation *\/ */
-/*     if ((fic = fopen("exemples.txt", "r")) == NULL ){ */
-/*         printf("ERREUR main : lors de l'ouverture du fichier\n"); */
-/*         exit(EXIT_FAILURE); */
-/*     } */
-
-/*     if ((tab_occ = (int *) calloc(256, sizeof(int))) == NULL){ */
-/*         printf("ERREUR main: echec calloc tab"); */
-/*         exit(EXIT_FAILURE); */
-/*     } */
-    
-/*     for(i = 0 ; i < 256 ; i++){ */
-/*         huffman[i] = NULL; /\* initialisation de Huffman *\/ */
-/*     } */
-
-/*     /\* Parcours du fichier et creation des noeuds *\/ */
-/*     while((g = fgetc(fic)) != EOF ){ */
-/*         tab_occ[g] += 1; */
-/*     } */
-/*     occurence(fic, tab_occ); */
-
-/*     for (i=0; i < 256; i++){ */
-/*         if (tab_occ[i] > 0){ */
-/*             if ((huffman[i] = (noeud *) malloc(sizeof(noeud))) == NULL){ */
-/*                 printf("ERREUR main: echec malloc huffman[%c]\n", i); */
-/*                 exit(EXIT_FAILURE); */
-/*             } */
-/*             huffman[i] = creer_feuille(tab_occ, i); */
-/*             taille++; */
-/*         } */
-/*     } */
-
-/*     /\* Affichage des occurences des caracteres dans le fichier *\/ */
-/*     for(i=0; i < 256; i++){ */
-/*         if(huffman[i] != NULL){ */
-/*             printf("%c : %d\n", huffman[i]->car, huffman[i]->occ); */
-/*         } */
-/*     } */
-
-/*     /\* Création d'un nouveau noeud *\/ */
-/*     creer_noeud(huffman, tab_occ, taille); */
-    
-/*     /\* Liberation de l'espace allouer *\/ */
-/*     for(i=0; i < 256; i++){ */
-/*         if( huffman[i] != NULL){ */
-/*             free(huffman[i]); */
-/*         } */
-/*     } */
-/*     exit(EXIT_SUCCESS); */
-/* } */
   

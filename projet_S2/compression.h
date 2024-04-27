@@ -2,8 +2,12 @@
 #define COMPRESSION_H
 
 #include"huffman.h"
+#include"code.h"
 
-void compression(noeud *alphabet[256], FILE *fic);
+/* Compresse fic dans un nouveau fichier avec une entete et le contenu separes par un retour a la ligne */
+void compression(noeud *alphabet[N], FILE *fic);
+
+int extraire_bit(int code, int index);
 
 void test();
 

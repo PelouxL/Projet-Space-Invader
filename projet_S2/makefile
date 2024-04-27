@@ -5,17 +5,20 @@ EXEC_FILES = main
 
 all : $(EXEC_FILES)
 
-main: main.c huffman.o compression.o code.o
+main: main.c huffman.o compression.o decompression.o code.o
 	$(CC) $(CFLAGS) -o $@ $^ -lm
 
 huffman.o: huffman.c huffman.h
-	$(CC) -c $(CFLAGS) $^
+	$(CC) -c $(CFLAGS) $<
 
 compression.o: compression.c compression.h
-	$(CC) -c $(CFLAGS) $^
+	$(CC) -c $(CFLAGS) $<
+
+decompression.o: decompression.c decompression.h
+	$(CC) -c $(CFLAGS) $<
 
 code.o: code.c code.h
-	$(CC) -c $(CFLAGS) $^
+	$(CC) -c $(CFLAGS) $<
 
 mgit:
 	git add --all; git commit -m "cc c moi"; git push;
