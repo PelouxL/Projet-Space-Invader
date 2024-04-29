@@ -1,9 +1,9 @@
 #include"decompression.h"
 
 void lire_entete(noeud *alphabet[N], FILE *fic){
-    int nb_feuille, i, a, bit,
+    int nb_feuille, i, a, bit, nb_bit_car,
         acc = 0;
-    char car, code, c;
+    char car, code;
 
     /* Initialisation */
     for (i=0; i < N; i++){
@@ -11,22 +11,27 @@ void lire_entete(noeud *alphabet[N], FILE *fic){
     }
 
     /* Recuperation du nombre de feuilles differentes */
-    fscanf(fic, "%c", &c);
-    nb_feuille = c;
-
+    nb_feuille = fgetc(fic);
     printf("nb feuille : %d\n", nb_feuille);
 
     while (acc < nb_feuille){
-        
+
         /* Caractere */
-        fscanf(fic, "%c", &car);
+        car = fgetc(fic);
         a = car;
-        printf("%c ", car);
+        fprintf(stdout, "<%c> %d : ", car, a);
+
+        if ((alphabet[a] = (noeud *) malloc(sizeof(noeud))) == NULL){
+            printf("ERREUR lire_entete: echec malloc \n");
+            exit(EXIT_FAILURE);
+        }
 
         /* Nombre de bits */
-        fscanf(fic, "%c", &c); /* W */
-        alphabet[a]->nb_bits = c;
-        printf("%d\n ", alphabet[a]->nb_bits);
+        /* for(k = 4 ; k > 0 ;k++){ */
+            /*  si 1 pow(1,k) */
+        nb_bit_car = fgetc(fic); /* W */
+        alphabet[a]->nb_bits = nb_bit_car;
+        printf("%d\n", alphabet[a]->nb_bits);
 
         /* Code */
         fscanf(fic, "%c", &code);
@@ -39,7 +44,7 @@ void lire_entete(noeud *alphabet[N], FILE *fic){
 
         acc++;
     }
-}
+} 
 
 void decompression(FILE *fic){
     noeud *alphabet[N];

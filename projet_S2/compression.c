@@ -8,7 +8,7 @@ int extraire_bit(int code, int index){
 }
 
 void entete(noeud *alphabet[N], FILE *res){
-    int i, j, acc, bit, nb_feuille = 0;
+    int i, j, acc, bit, nb_feuille = 0, reste, op=0;
     noeud *feuille = NULL;
     char paquet = 0;
 
@@ -28,16 +28,24 @@ void entete(noeud *alphabet[N], FILE *res){
         if ((feuille = alphabet[i]) != NULL){
 
             /* Caractere */
-            fprintf(stdout, "%c", feuille->car);
+            fprintf(res, "%c", feuille->car);
 
-            /* Nombre de bits */
-            fprintf(stdout, "%d", feuille->nb_bits);
+            /* Nombre de bits sur les 4 1er bits du paquet */
+            for (j=3; j >= 0; j--){
+                reste = feuille->nb_bits;
+
+                op=reste / pow(2, j);
+                paquet = paquet << 1;
+                paquet = paquet | op;
+                
+                reste %= pow(2, j) == 1;       
+            }
+            acc -= 4;
 
             /* Code */
             for (j = feuille->nb_bits; j > 0; j--){
                 bit = extraire_bit(feuille->code, j-1);
 
-                /* Creation d'une place + insertion du bit dans le paquet */
                 paquet = paquet << 1;
                 paquet = paquet | bit;
                 
@@ -48,14 +56,13 @@ void entete(noeud *alphabet[N], FILE *res){
                 }
                 
             }
-        }
         
-        /* S'il reste encore de la place dans le paquet */
-        if (acc != 0 && acc != 8){
-            paquet = paquet << acc; /* On rempli les places restantes */
-            fprintf(res, "%c", paquet); /* On ecrit le caractere correspondant dans res */
+            /* S'il reste encore de la place dans le paquet apres avoir ecrit le code */
+            if (acc != 0 && acc != 8){
+                paquet = paquet << acc; /* On rempli les places restantes */
+                fprintf(res, "%c", paquet); /* On ecrit le caractere correspondant dans res */
+            }
         }
-        
     }
 }
 
