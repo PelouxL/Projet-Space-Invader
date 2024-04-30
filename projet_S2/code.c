@@ -17,9 +17,9 @@ void creer_code(noeud *element, int code, int profondeur){
     if (est_feuille(courant) == 1){
         courant->code = code;
         courant->nb_bits = profondeur;
-        printf("%c : ", courant->car);
+        printf("< %c > %d : ", courant->car, courant->car);
         affichage_code(courant->nb_bits,  courant->code);
-        printf("\n");
+        printf(" sur %d bits\n", courant->nb_bits);
     }
     
     /* Rappel recursif = on descend dans l'arbre d'Huffman */

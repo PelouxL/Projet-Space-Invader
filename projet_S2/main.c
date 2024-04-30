@@ -67,7 +67,7 @@ int main(){
     fic = NULL;
 
     compression(alphabet, fic);
-    decompression(fic);
+    /* decompression(fic); */
         
     exit(EXIT_SUCCESS);
 }
